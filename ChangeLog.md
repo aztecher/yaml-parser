@@ -1,3 +1,3 @@
-# Changelog for yaml-parser
+# Changelog for parsec-test
 
 ## Unreleased changes

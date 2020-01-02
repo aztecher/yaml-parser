@@ -1,10 +1,10 @@
-name:                yaml-parser
+name:                parsec-test
 version:             0.1.0.0
-github:              "mikiyaf/yaml-parser"
+github:              "githubuser/parsec-test"
 license:             BSD3
-author:              "Mikiya Michishita"
+author:              "Author name here"
 maintainer:          "example@example.com"
-copyright:           "2019 Mikiya Michishita"
+copyright:           "2019 Author name here"
 
 extra-source-files:
 - README.md
@@ -17,22 +17,18 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/mikiyaf/yaml-parser#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/parsec-test#readme>
 
 dependencies:
 - base >= 4.7 && < 5
 - megaparsec
 - text
 
-default-extensions:
-  - GADTs
-  - OverloadedStrings
-
 library:
   source-dirs: src
 
 executables:
-  yaml-parser-exe:
+  parsec-test-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -40,10 +36,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - yaml-parser
+    - parsec-test
 
 tests:
-  yaml-parser-test:
+  parsec-test-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -51,4 +47,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - yaml-parser
+    - parsec-test
