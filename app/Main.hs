@@ -1,11 +1,13 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 module Main where
 
 import Lib
 import System.IO
 import Data.Char (isSpace, isSeparator)
 
-import Control.Applicative hiding (many)
+import Control.Applicative hiding (many, some)
 import Control.Monad
 import Data.Text (Text)
 import Data.Void
@@ -15,21 +17,11 @@ import qualified Data.Text as T
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Debug(dbg)
 
--- 我々のYAMLはScalarに改行を許しません
--- type Key = Text
--- data Yaml = Scalar Text
---           | Sequence [Yaml]
---           | Mapping (Key, Yaml)
---           | Comment Text
---           | Block [Yaml]
---   deriving (Eq, Show)
-
 newtype Key = Key Text deriving (Eq, Show)
 newtype Scalar = Scalar Text deriving (Eq, Show)
 data Sentence where
   Sequence  :: [Yaml] -> Sentence
   Mapping   :: Key -> Yaml -> Sentence
-  Comment   :: Text -> Sentence
     deriving (Eq, Show)
 
 data Yaml where
@@ -39,29 +31,53 @@ data Yaml where
 
 type Parser = Parsec Void Text
 
+lineComment :: Parser ()
+lineComment = L.skipLineComment "#"
+
+scn :: Parser ()
+scn = L.space space1 lineComment empty
+
+sc :: Parser ()
+sc = L.space (void $ some (char ' ' <|> char '\t')) lineComment empty
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme sc
+
+
+
+---------------------------------------------------------------------------------------------------
+
 isLiteral :: Char -> Bool
 isLiteral c = c `notElem` [' ', '\n']
 
-newline' :: Parser ()
-newline' = dbg "N" (void (char '\n') <|> void newline) <|> eof
-
 litStr :: Parser Text
-litStr = takeWhile1P (Just "litStr") isLiteral
+litStr = lexeme $ takeWhile1P (Just "litStr") isLiteral
 
 pKey :: Parser Key
 pKey = Key <$> takeWhile1P (Just "Key") (/= ':')
 
 pYaml :: Parser Yaml
-pYaml = pBlock <|> pLiteral
+pYaml =  pLiteral <|> pBlock
 -- pYaml = dbg "yaml" pScalar
 
--- FIXME: parseTest pBlock "abc: def   \ncde: efg"
+-- FIXME: parsetest pblock "abc: def   \ncde: efg"
 -- FIXME: なにもわからない(eofで止まらない)
 pBlock :: Parser Yaml
 pBlock = Block <$> many (dbg "Mapping" pMapping')
   where
     space' = takeWhileP Nothing (== ' ')
-    pMapping' = pMapping <* space' <* newline'
+
+top :: Parser Yaml
+top = L.nonIndented scn p
+  where
+    p = do
+      key <- pKey
+      char ':'
+      return $ noPattern <|> somePattern <|>  manyPattern
+        where
+          noPattern = lexeme pLiteral
+          somePattern = return (L.IndentSome Nothing (pure . Block) pMapping) -- これが問題
+          manyPattern = undefined
 
 pMapping :: Parser Sentence
 pMapping = do
