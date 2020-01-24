@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 14a3a8433780f26cac22d6c8d013a2b5784213e5d10bb0cf6afa0d3d59b7cde1
+-- hash: b3dccc848e4aa648e804c233d16211df3399dc3a325454859ea23929cf332048
 
 name:           parsec-test
 version:        0.1.0.0
@@ -35,6 +35,7 @@ library
   build-depends:
       base >=4.7 && <5
     , megaparsec
+    , pretty-simple
     , text
   default-language: Haskell2010
 
@@ -49,6 +50,7 @@ executable parsec-test-exe
       base >=4.7 && <5
     , megaparsec
     , parsec-test
+    , pretty-simple
     , text
   default-language: Haskell2010
 
@@ -64,5 +66,6 @@ test-suite parsec-test-test
       base >=4.7 && <5
     , megaparsec
     , parsec-test
+    , pretty-simple
     , text
   default-language: Haskell2010
